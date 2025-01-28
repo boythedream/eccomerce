@@ -27,13 +27,13 @@ async function getData(productId: string) {
   return data;
 }
 
-type Props = {
-  readonly params: Readonly<{ id: string }>;
-  readonly searchParams: Readonly<{ [key: string]: string | string[] | undefined }>;
-};
-
-export default async function ProductIdRoute({ params }: Props) {
-  const data = await getData(params.id);
+export default async function ProductIdRoute({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const resolvedParams = await params;
+  const data = await getData(resolvedParams.id);
   const addProductShoppingCart = addItem.bind(null, data.id);
 
   return (
