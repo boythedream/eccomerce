@@ -25,16 +25,13 @@ async function getData(productId: string) {
   return data;
 }
 
-type PageProps = {
-  params: {
-    id: string;
-  };
-};
-
-export default async function ProductIdRoute({ params }: PageProps) {
+export default async function ProductIdRoute({
+  params,
+}: {
+  params: { id: string };
+}) {
   const data = await getData(params.id);
-
-  const addProductShoppingCart = addItem.bind(null, data?.id);
+  const addProductShoppingCart = addItem.bind(null, data.id);
   if (!data) {
     return <div>Product not found</div>;
   }
