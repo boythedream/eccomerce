@@ -6,49 +6,33 @@ import prisma from "@/app/lib/db";
 import { StarIcon } from "lucide-react";
 import { notFound } from "next/navigation";
 
-// Types
-interface Product {
-  id: string;
-  price: number;
-  images: string[];
-  name: string;
-  description: string;
-}
-
 type PageProps = {
   params: {
     id: string;
   };
 };
 
-// Data fetching function
-async function getData(productId: string): Promise<Product> {
-  try {
-    const data = await prisma.product.findUnique({
-      where: {
-        id: productId,
-      },
-      select: {
-        id: true,
-        price: true,
-        images: true,
-        name: true,
-        description: true,
-      },
-    });
+async function getData(productId: string) {
+  const data = await prisma.product.findUnique({
+    where: {
+      id: productId,
+    },
+    select: {
+      id: true,
+      price: true,
+      images: true,
+      name: true,
+      description: true,
+    },
+  });
 
-    if (!data) {
-      notFound();
-    }
-
-    return data;
-  } catch (error) {
-    console.error('Error fetching product:', error);
-    throw new Error('Failed to fetch product');
+  if (!data) {
+    notFound();
   }
+
+  return data;
 }
 
-// Main component
 export default async function ProductIdRoute({ params }: PageProps) {
   const data = await getData(params.id);
   const addProductShoppingCart = addItem.bind(null, data.id);
@@ -84,21 +68,5 @@ export default async function ProductIdRoute({ params }: PageProps) {
         <FeaturedProducts />
       </div>
     </>
-  );
-}
-
-// Error boundary component (optional but recommended)
-export function ErrorBoundary({ error }: { error: Error }) {
-  return (
-    <div className="flex items-center justify-center min-h-[400px]">
-      <div className="text-center">
-        <h2 className="text-2xl font-semibold text-gray-900">
-          Something went wrong
-        </h2>
-        <p className="mt-2 text-gray-600">
-          {error.message || 'Failed to load product'}
-        </p>
-      </div>
-    </div>
   );
 }
