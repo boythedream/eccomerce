@@ -6,35 +6,53 @@ import prisma from "@/app/lib/db";
 import { StarIcon } from "lucide-react";
 import { notFound } from "next/navigation";
 
-async function getData(productId: string) {
-  const data = await prisma.product.findUnique({
-    where: {
-      id: productId,
-    },
-    select: {
-      id: true,
-      price: true,
-      images: true,
-      name: true,
-      description: true,
-    },
-  });
-  if (!data) {
-    return notFound();
-  }
-  return data;
+// Types
+interface Product {
+  id: string;
+  price: number;
+  images: string[];
+  name: string;
+  description: string;
 }
 
-export default async function ProductIdRoute({
-  params,
-}: {
-  params: { id: string };
-}) {
+type PageProps = {
+  params: {
+    id: string;
+  };
+};
+
+// Data fetching function
+async function getData(productId: string): Promise<Product> {
+  try {
+    const data = await prisma.product.findUnique({
+      where: {
+        id: productId,
+      },
+      select: {
+        id: true,
+        price: true,
+        images: true,
+        name: true,
+        description: true,
+      },
+    });
+
+    if (!data) {
+      notFound();
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    throw new Error('Failed to fetch product');
+  }
+}
+
+// Main component
+export default async function ProductIdRoute({ params }: PageProps) {
   const data = await getData(params.id);
   const addProductShoppingCart = addItem.bind(null, data.id);
-  if (!data) {
-    return <div>Product not found</div>;
-  }
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start lg:gap-x-24 py-6">
@@ -44,19 +62,20 @@ export default async function ProductIdRoute({
             {data.name}
           </h1>
           <p className="text-3xl mt-2 tracking-tight text-gray-900">
-            {data.price}
+            ${data.price.toFixed(2)}
           </p>
           <div className="mt-3 flex items-center gap-1">
-            <StarIcon className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-            <StarIcon className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-            <StarIcon className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-            <StarIcon className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-            <StarIcon className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+            {[...Array(5)].map((_, index) => (
+              <StarIcon
+                key={index}
+                className="h-4 w-4 text-yellow-500 fill-yellow-500"
+              />
+            ))}
           </div>
           <div className="mt-4">
             <p className="text-gray-700">{data.description}</p>
           </div>
-          <form action={addProductShoppingCart}>
+          <form action={addProductShoppingCart} className="mt-6">
             <ShoppingBagButton />
           </form>
         </div>
@@ -65,5 +84,21 @@ export default async function ProductIdRoute({
         <FeaturedProducts />
       </div>
     </>
+  );
+}
+
+// Error boundary component (optional but recommended)
+export function ErrorBoundary({ error }: { error: Error }) {
+  return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="text-center">
+        <h2 className="text-2xl font-semibold text-gray-900">
+          Something went wrong
+        </h2>
+        <p className="mt-2 text-gray-600">
+          {error.message || 'Failed to load product'}
+        </p>
+      </div>
+    </div>
   );
 }
