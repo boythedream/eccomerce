@@ -6,12 +6,6 @@ import prisma from "@/app/lib/db";
 import { StarIcon } from "lucide-react";
 import { notFound } from "next/navigation";
 
-type PageProps = {
-  params: {
-    id: string;
-  };
-};
-
 async function getData(productId: string) {
   const data = await prisma.product.findUnique({
     where: {
@@ -33,7 +27,12 @@ async function getData(productId: string) {
   return data;
 }
 
-export default async function ProductIdRoute({ params }: PageProps) {
+type Props = {
+  readonly params: Readonly<{ id: string }>;
+  readonly searchParams: Readonly<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function ProductIdRoute({ params }: Props) {
   const data = await getData(params.id);
   const addProductShoppingCart = addItem.bind(null, data.id);
 
