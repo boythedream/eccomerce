@@ -1,20 +1,20 @@
 import { deleteBanner } from "@/app/actions";
 import { SubmitButton } from "@/app/components/SubmitButton";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
-interface PageProps {
-  params: { id: string };
+interface DeleteBannerRouteProps {
+  params: {
+    id: string;
+  };
 }
 
-export default function DeleteBannerRoute({ params }: PageProps) {
+export default function DeleteBannerRoute({ params }: DeleteBannerRouteProps) {
+  if (!params || !params.id) {
+    return <div>Error: Invalid or missing banner ID.</div>;
+  }
+
   return (
     <div className="h-[80vh] flex items-center justify-center">
       <Card className="max-w-xl">
@@ -44,5 +44,6 @@ export default function DeleteBannerRoute({ params }: PageProps) {
     </div>
   );
 }
+
         
          
