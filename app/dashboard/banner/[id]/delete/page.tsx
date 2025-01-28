@@ -4,16 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
-interface DeleteBannerRouteProps {
+// Define the PageProps for this specific component
+type PageProps = {
   params: {
     id: string;
   };
-}
+};
 
-export default function DeleteBannerRoute({ params }: DeleteBannerRouteProps) {
-  if (!params || !params.id) {
-    return <div>Error: Invalid or missing banner ID.</div>;
-  }
+export default async function DeleteBannerRoute({ params }: PageProps) {
+  // You can safely use params.id here as it's already typed
+  const bannerId = params.id;
+
+  // Logic to delete the banner using the bannerId can go here
+  const handleDelete = async () => {
+    await deleteBanner(bannerId);
+    // Optionally navigate away after deletion
+  };
 
   return (
     <div className="h-[80vh] flex items-center justify-center">
@@ -21,8 +27,7 @@ export default function DeleteBannerRoute({ params }: DeleteBannerRouteProps) {
         <CardHeader>
           <CardTitle>Are you absolutely sure?</CardTitle>
           <CardDescription>
-            This action cannot be undone. This will permanently delete the
-            banner and all of its data from our server.
+            This action cannot be undone. This will permanently delete the banner and all of its data from our server.
           </CardDescription>
         </CardHeader>
         <CardFooter>
@@ -30,13 +35,9 @@ export default function DeleteBannerRoute({ params }: DeleteBannerRouteProps) {
             <Button variant="outline" className="flex-1" asChild>
               <Link href="/dashboard/banner">Cancel</Link>
             </Button>
-            <form action={deleteBanner} className="flex-1">
-              <input type="hidden" name="bannerId" value={params.id} />
-              <SubmitButton
-                variant="destructive"
-                className="w-full"
-                text="Delete Banner"
-              />
+            <form action={handleDelete} className="flex-1">
+              <input type="hidden" name="bannerId" value={bannerId} />
+              <SubmitButton variant="destructive" className="w-full" text="Delete Banner" />
             </form>
           </div>
         </CardFooter>
@@ -44,6 +45,7 @@ export default function DeleteBannerRoute({ params }: DeleteBannerRouteProps) {
     </div>
   );
 }
+
 
         
          
